@@ -1,0 +1,55 @@
+<header class="header">
+
+    <div class="header-logo">
+        <a href="index.html">
+            <img title="Homie Logo" aria-label="Homie Logo"
+                 src="images/logo.png">
+        </a>
+    </div>
+
+    <div class="header-text">
+        <p>Willkommen bei Homie - vernetze, steuere, entspanne.</p>
+    </div>
+
+    <nav class="nav">
+        <a href="index.html" aria-label="Startseite">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                 viewBox="0 0 24 24" fill="none"
+                 stroke="#000000" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round">
+                <path d="M20 9v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9"/>
+                <path d="M9 22V12h6v10M2 10.6L12 2l10 8.6"/>
+            </svg>
+        </a>
+        <a href="edit.html" aria-label="Hinzufügen">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                 viewBox="0 0 24 24" fill="none"
+                 stroke="#000000" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" class="lucide lucide-plus">
+                <path d="M5 12h14"/>
+                <path d="M12 5v14"/>
+            </svg>
+        </a>
+
+        <!-- Suchfeld und Lupe -->
+        <div class="search-container">
+            <a href="#" id="search-icon" aria-label="Suche öffnen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                     viewBox="0 0 24 24" fill="none"
+                     stroke="#000000" stroke-width="2" stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </a>
+            <div id="search-filter-wrapper" class="hidden">
+            <input type="text" id="search-field" placeholder="Suche...">
+            <div class="power-filter">
+                <label for="power-min">Leistung von:</label>
+                <input type="number" id="power-min" placeholder="Min (W)">
+                <label for="power-max">bis:</label>
+                <input type="number" id="power-max" placeholder="Max (W)">
+            </div>
+        </div>
+    </nav>
+</header>
