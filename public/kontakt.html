@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kontakt - Homie</title>
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/x-icon" href="images/logo3.ico">
@@ -18,18 +17,14 @@
         <style>
             #map {
                 height: 400px;
-                width: 100%; /* Karte soll die volle Breite nutzen */
-                border-radius: 10px; /* Abgerundete Ecken für modernes Design */
+                width: 100%;
+                border-radius: 10px;
                 margin-top: 20px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Leichter Schatten für besseren Look */
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             }
         </style>
-
     </div>
     <div class="contact-container">
-
-
-
         <div class="contact">
             <h1>Kontaktformular</h1>
             <select id="anrede">
@@ -50,7 +45,6 @@
             <input type="text" placeholder="Betreff" class="contactInput">
             <label>Ihre Nachricht</label>
             <textarea id="nachricht" placeholder="Nachricht" class="contactTextarea"></textarea>
-
             <button type="submit" class="btn-submit" id="send-btn">Senden</button>
         </div>
     </div>

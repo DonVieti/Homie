@@ -14,7 +14,7 @@
 <main class="content">
     <h1 id="form-title">Gerät hinzufügen</h1>
     <form id="device-form">
-        <input type="hidden" id="device-id"> <!-- 🛠️ Für Update notwendig -->
+        <input type="hidden" id="device-id">
         <input type="text" id="device-name" placeholder="Gerätename" required minlength="3">
         <input type="text" id="device-type" placeholder="Gerätetyp (z. B. Lampe, Steckdose)" required minlength="3" pattern="[A-Za-zÄÖÜäöüß\s]+" title="Nur Buchstaben und Leerzeichen erlaubt.">
         <input type="number" id="device-power" placeholder="Leistung in Watt"

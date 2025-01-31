@@ -21,10 +21,10 @@ export default async function handler(req, res) {
             if (!name || !type || !power || !room || !category || !image) {
                 return res.status(400).json({ error: 'Alle Felder sind erforderlich' });
             }
-
+            // Prepared Statement
             await db.execute(
                 'INSERT INTO devices (name, type, power, room, category, image) VALUES (?, ?, ?, ?, ?, ?)',
-                [name, type, power, room, category, image]// ✅ Prepared Statement
+                [name, type, power, room, category, image]
             );
             return res.status(201).json({ message: 'Gerät hinzugefügt' });
         }
