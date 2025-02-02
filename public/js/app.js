@@ -413,7 +413,7 @@ function setupCRUD() {
         }
 
         // Standard-Bild
-        const image = getValidImage(imageName);
+        const image = await getValidImage(imageName);
 
         // Wenn ID übergeben wird, dann update, sonst add
         if (id) {
@@ -631,20 +631,20 @@ function showConfirmationMessage() {
 
 // Default-Bild setzen
 function getValidImage(imageName) {
-    if (!imageName || !imageName.includes("/")) {
-        return "images/default.png";
-    }
+    return new Promise((resolve) => {
+        if (!imageName || !imageName.includes("/")) {
+            return resolve("images/default.png"); // 🔥 Falls leer oder kein "/" enthalten
+        }
 
-    // 🔹 Versuche, das Bild zu laden
-    const img = new Image();
-    img.src = imageName;
+        const img = new Image();
+        img.src = imageName;
 
-    img.onerror = function () {
-        console.warn(`Bild nicht gefunden: ${imageName}, Standardbild wird verwendet.`);
-        img.src = "images/default.png";
-    };
-
-    return imageName;
+        img.onload = () => resolve(imageName); // ✅ Bild existiert → Rückgabe des originalen Namens
+        img.onerror = () => {
+            console.warn(`❌ Bild nicht gefunden: ${imageName}, Standardbild wird verwendet.`);
+            resolve("images/default.png"); // ❌ Bild nicht gefunden → Fallback auf default
+        };
+    });
 }
 
 
