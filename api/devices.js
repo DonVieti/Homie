@@ -9,24 +9,50 @@ export default async function handler(req, res) {
     try {
         // Tabelle devices abrufen
         if (req.method === 'GET') {
-            // Geräte abrufen
-            const devices = await db.execute('SELECT * FROM devices');
-            // Kategorien abrufen
-            const deviceCategoryMap = await db.execute(`
-                SELECT dc.device_id, c.id AS category_id, c.name AS category_name 
-                FROM device_category dc 
-                JOIN category c ON dc.category_id = c.id
-            `);
+            const { id } = req.query;
 
-            // Kategorien zuordnen
-            const devicesWithCategories = devices.rows.map(device => ({
-                ...device,
-                categories: deviceCategoryMap.rows
-                    .filter(dc => dc.device_id === device.id)
-                    .map(dc => ({ id: dc.category_id, name: dc.category_name }))
-            }));
+            // Einzeldetails laden
+            if (id) {
+                const deviceResult = await db.execute('SELECT * FROM devices WHERE id = ?', [id]);
 
-            return res.status(200).json(devicesWithCategories);
+                if (deviceResult.rows.length === 0) {
+                    return res.status(404).json({ error: "Gerät nicht gefunden" });
+                }
+
+                const device = deviceResult.rows[0];
+
+                // Kategorien für dieses Gerät abrufen
+                const categoriesResult = await db.execute(`
+                    SELECT c.id AS category_id, c.name AS category_name
+                    FROM device_category dc 
+                    JOIN category c ON dc.category_id = c.id
+                    WHERE dc.device_id = ?
+                `, [id]);
+
+                return res.status(200).json({
+                    ...device,
+                    categories: categoriesResult.rows.map(cat => ({
+                        id: cat.category_id,
+                        name: cat.category_name
+                    }))
+                });
+            } else { // Alle Geräte laden
+                const devices = await db.execute('SELECT * FROM devices');
+                const deviceCategoryMap = await db.execute(`
+                    SELECT dc.device_id, c.id AS category_id, c.name AS category_name 
+                    FROM device_category dc 
+                    JOIN category c ON dc.category_id = c.id
+                `);
+
+                const devicesWithCategories = devices.rows.map(device => ({
+                    ...device,
+                    categories: deviceCategoryMap.rows
+                        .filter(dc => dc.device_id === device.id)
+                        .map(dc => ({ id: dc.category_id, name: dc.category_name }))
+                }));
+
+                return res.status(200).json(devicesWithCategories);
+            }
         }
 
         if (req.method === 'POST') {
