@@ -9,9 +9,9 @@ export default async function handler(req, res) {
     try {
         // Tabelle devices abrufen
         if (req.method === 'GET') {
-            const { id } = req.body;
+            const { id } = req.query; // 🔥 ID aus Query holen
 
-            // Einzeldetails laden
+            // 🔹 EINZELNES GERÄT LADEN
             if (id) {
                 const deviceResult = await db.execute('SELECT * FROM devices WHERE id = ?', [id]);
 
@@ -21,11 +21,11 @@ export default async function handler(req, res) {
 
                 const device = deviceResult.rows[0];
 
-                // Kategorien für dieses Gerät abrufen
+                // 🔹 KATEGORIEN FÜR DIESES GERÄT LADEN
                 const categoriesResult = await db.execute(`
                     SELECT c.id AS category_id, c.name AS category_name
-                    FROM device_category dc 
-                    JOIN category c ON dc.category_id = c.id
+                    FROM device_category dc
+                             JOIN category c ON dc.category_id = c.id
                     WHERE dc.device_id = ?
                 `, [id]);
 
@@ -36,23 +36,24 @@ export default async function handler(req, res) {
                         name: cat.category_name
                     }))
                 });
-            } else { // Alle Geräte laden
-                const devices = await db.execute('SELECT * FROM devices');
-                const deviceCategoryMap = await db.execute(`
-                    SELECT dc.device_id, c.id AS category_id, c.name AS category_name 
-                    FROM device_category dc 
-                    JOIN category c ON dc.category_id = c.id
-                `);
-
-                const devicesWithCategories = devices.rows.map(device => ({
-                    ...device,
-                    categories: deviceCategoryMap.rows
-                        .filter(dc => dc.device_id === device.id)
-                        .map(dc => ({ id: dc.category_id, name: dc.category_name }))
-                }));
-
-                return res.status(200).json(devicesWithCategories);
             }
+
+            // 🔹 ALLE GERÄTE LADEN
+            const devices = await db.execute('SELECT * FROM devices');
+            const deviceCategoryMap = await db.execute(`
+        SELECT dc.device_id, c.id AS category_id, c.name AS category_name 
+        FROM device_category dc 
+        JOIN category c ON dc.category_id = c.id
+    `);
+
+            const devicesWithCategories = devices.rows.map(device => ({
+                ...device,
+                categories: deviceCategoryMap.rows
+                    .filter(dc => dc.device_id === device.id)
+                    .map(dc => ({ id: dc.category_id, name: dc.category_name }))
+            }));
+
+            return res.status(200).json(devicesWithCategories);
         }
 
         if (req.method === 'POST') {
