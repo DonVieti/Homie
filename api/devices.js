@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     try {
         // Tabelle devices abrufen
         if (req.method === 'GET') {
-            const { id } = req.query;
+            const { id } = req.body;
 
             // Einzeldetails laden
             if (id) {
