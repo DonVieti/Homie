@@ -368,13 +368,13 @@ async function updateDevice(id, name, type, power, room, category, image) {
     }
 }
 // Gerät hinzufügen mittels post
-async function addDevice(name, type, power, room, category, image) {
+async function addDevice(name, type, power, room, categories, image) {
     try {
         // post anfrage mittels json-format
         await fetch('/api/devices', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({name, type, power, room, category, image}),
+            body: JSON.stringify({name, type, power, room, categories, image}),
         });
         loadDevices();
     } catch (error) {
