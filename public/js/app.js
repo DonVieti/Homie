@@ -407,11 +407,6 @@ function setupCRUD() {
         }
 
         let imageName = document.getElementById("device-image").value.trim();
-        // Falls der Benutzer keine Dateiendung (.png, .jpg, .jpeg) angibt, füge .png hinzu
-        if (imageName && !imageName.includes(".")) {
-            imageName += ".png";
-        }
-
         // Standard-Bild
         const image = await getValidImage(imageName);
 
@@ -630,22 +625,33 @@ function showConfirmationMessage() {
 }
 
 // Default-Bild setzen
-function getValidImage(imageName) {
+async function getValidImage(imageName) {
     return new Promise((resolve) => {
-        if (!imageName || !imageName.includes("/")) {
-            return resolve("images/default.png"); // 🔥 Falls leer oder kein "/" enthalten
+        if (!imageName) {
+            return resolve("images/default.png");
+        }
+
+        // Falls keine Dateiendung
+        if (!imageName.includes(".")) {
+            imageName += ".png";
+        }
+
+        // Falls kein "images/"
+        if (!imageName.includes("/")) {
+            imageName = `images/${imageName}`;
         }
 
         const img = new Image();
         img.src = imageName;
 
-        img.onload = () => resolve(imageName); // ✅ Bild existiert → Rückgabe des originalen Namens
+        img.onload = () => resolve(imageName);
         img.onerror = () => {
-            console.warn(`❌ Bild nicht gefunden: ${imageName}, Standardbild wird verwendet.`);
-            resolve("images/default.png"); // ❌ Bild nicht gefunden → Fallback auf default
+            console.warn(`Bild nicht gefunden: ${imageName}, Standardbild wird verwendet.`);
+            resolve("images/default.png");
         };
     });
 }
+
 
 
 
