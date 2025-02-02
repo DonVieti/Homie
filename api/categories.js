@@ -66,7 +66,7 @@ export default async function handler(req, res) {
             if (!id || !name) {
                 return res.status(400).json({ error: 'ID und Name sind erforderlich' });
             }
-            / Prepared Statement update
+            // Prepared Statement update
             const result = await db.execute(
                 'UPDATE category SET name=? WHERE id=?',
                 [name, id]
