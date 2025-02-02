@@ -174,9 +174,15 @@ function initializeFiltering() {
 async function loadCategories() {
     try {
         const response = await fetch('/api/categories');
+
+        // 🔥 Falls die API nicht mit Status 200 antwortet, werfe Fehler
+        if (!response.ok) {
+            const errorText = await response.text(); // 🔥 Fehlertext abrufen
+            throw new Error(`Fehler ${response.status}: ${errorText}`);
+        }
+
         const categories = await response.json();
 
-        // Vorherige Einträge löschen (falls vorhanden)
         const categoryContainer = document.getElementById('category-options');
         categoryContainer.innerHTML = '';
 
@@ -185,9 +191,7 @@ async function loadCategories() {
             const checkbox = document.createElement('input');
 
             checkbox.type = 'checkbox';
-            // Kategorie-ID statt Name speichern
             checkbox.value = category.id;
-            // default Name für einfaches Abrufen
             checkbox.name = 'categories';
             label.appendChild(checkbox);
             label.appendChild(document.createTextNode(` ${category.name}`));
@@ -195,7 +199,8 @@ async function loadCategories() {
             categoryContainer.appendChild(label);
         });
     } catch (error) {
-        console.error('Fehler beim Laden der Kategorien:', error);
+        console.error('❌ Fehler beim Laden der Kategorien:', error);
+        alert(`Fehler beim Laden der Kategorien: ${error.message}`);
     }
 }
 

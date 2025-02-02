@@ -82,6 +82,6 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Methode nicht erlaubt' });
     } catch (error) {
         console.error('Fehler in der API:', error);
-        return res.status(500).json({ error: 'Interner Serverfehler' });
+        return res.status(500).json({ error: 'Interner Serverfehler', details: error.message });
     }
 }
