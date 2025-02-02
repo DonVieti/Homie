@@ -413,7 +413,7 @@ function setupCRUD() {
         }
 
         // Standard-Bild
-        const image = imageName && !imageName.includes("/") ? `images/${imageName}` : imageName || "images/default.png";
+        const image = getValidImage(imageName);
 
         // Wenn ID übergeben wird, dann update, sonst add
         if (id) {
@@ -627,6 +627,24 @@ function showConfirmationMessage() {
         <p>Wir werden uns so schnell wie möglich bei Ihnen melden.</p>
         <a href="index.html" class="contact-btn-back" >Zur Startseite</a>
     `;
+}
+
+// Default-Bild setzen
+function getValidImage(imageName) {
+    if (!imageName || !imageName.includes("/")) {
+        return "images/default.png";
+    }
+
+    // 🔹 Versuche, das Bild zu laden
+    const img = new Image();
+    img.src = imageName;
+
+    img.onerror = function () {
+        console.warn(`Bild nicht gefunden: ${imageName}, Standardbild wird verwendet.`);
+        img.src = "images/default.png";
+    };
+
+    return imageName;
 }
 
 
