@@ -11,9 +11,9 @@ export default async function handler(req, res) {
         if (req.method === 'GET') {
             // Alle Kategorien abrufen mit der Anzahl der Geräte
             const categories = await db.execute(`
-                SELECT c.*, 
-                (SELECT COUNT(*) FROM device_category WHERE category_id = c.id) AS device_count 
-                FROM category c
+                SELECT category.id, category.name,
+                       (SELECT COUNT(*) FROM device_category WHERE device_category.category_id = category.id) AS device_count
+                FROM category
             `);
             return res.status(200).json(categories.rows);
         }
