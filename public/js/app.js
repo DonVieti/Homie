@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (path.includes("edit.html")) {
+        loadCategories();
         setupCRUD();
         loadDevices();
     }
@@ -168,6 +169,36 @@ function initializeFiltering() {
         powerMaxField.addEventListener("keydown", filterOnEnter);
     }
 }
+
+// Kategorien aus API abfragen
+async function loadCategories() {
+    try {
+        const response = await fetch('/api/categories');
+        const categories = await response.json();
+
+        // Vorherige Einträge löschen (falls vorhanden)
+        const categoryContainer = document.getElementById('category-options');
+        categoryContainer.innerHTML = '';
+
+        categories.forEach(category => {
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+
+            checkbox.type = 'checkbox';
+            // Kategorie-ID statt Name speichern
+            checkbox.value = category.id;
+            // default Name für einfaches Abrufen
+            checkbox.name = 'categories';
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(` ${category.name}`));
+
+            categoryContainer.appendChild(label);
+        });
+    } catch (error) {
+        console.error('Fehler beim Laden der Kategorien:', error);
+    }
+}
+
 // Liste aus API abfragen
 async function fetchDevices() {
     try {
@@ -203,15 +234,15 @@ async function editDevice(id) {
     }
     // automatisch ausfüllen, wenn edit.html geöffnet wird
     if (window.location.pathname.includes("edit.html")) {
+        const idField = document.getElementById("device-id");
         const nameField = document.getElementById("device-name");
         const typeField = document.getElementById("device-type");
         const powerField = document.getElementById("device-power");
         const roomField = document.getElementById("device-room");
-        const categoryField = document.getElementById("device-category");
         const imageField = document.getElementById("device-image");
-        const idField = document.getElementById("device-id");
 
-        if (!nameField || !typeField || !powerField || !roomField || !categoryField || !imageField || !idField) {
+
+        if (!nameField || !typeField || !powerField || !roomField || !imageField || !idField) {
             console.error("Bearbeitungsformular nicht gefunden.");
             return;
         }
@@ -220,8 +251,22 @@ async function editDevice(id) {
         typeField.value = device.type;
         powerField.value = device.power;
         roomField.value = device.room;
-        categoryField.value = device.category;
         imageField.value = device.image || "images/default.png";
+        // Lade die Kategorien in das Formular
+        await loadCategories();
+
+        // Warte kurz, bis DOM aktualisiert wurde
+        setTimeout(() => {
+            const categoryCheckboxes = document.querySelectorAll('input[name="categories"]');
+
+            device.categories.forEach(category => {
+                categoryCheckboxes.forEach(checkbox => {
+                    if (parseInt(checkbox.value) === category.id) {
+                        checkbox.checked = true;
+                    }
+                });
+            });
+        }, 500);
 
         document.getElementById("form-title").textContent = "Gerät bearbeiten";
         document.getElementById("edit-btn").textContent = "bearbeiten";
@@ -272,6 +317,7 @@ async function loadDevices() {
 
     // Tabelle mit Liste ausfüllen
     devices.forEach(device => {
+        const categoryNames = device.categories?.map(cat => cat.name).join(", ") || "Keine Kategorie";
         const row = document.createElement("tr");
         row.innerHTML = `
             <td><img src="${device.image}" alt="${device.name}" width="50"></td>
@@ -279,7 +325,7 @@ async function loadDevices() {
             <td>${device.type}</td>
             <td>${device.power} W</td>
             <td>${device.room}</td>
-            <td>${device.category}</td>
+            <td>${categoryNames}</td>
             <td>
                 <button onclick="editDevice(${device.id})"class="btn-edit">Bearbeiten</button>
                 <button onclick="deleteDevice(${device.id})"class="btn-delete">Löschen</button>
@@ -346,9 +392,16 @@ function setupCRUD() {
         const type = document.getElementById("device-type").value;
         const power = document.getElementById("device-power").value;
         const room = document.getElementById("device-room").value;
-        const category = document.getElementById("device-category").value;
-        let imageName = document.getElementById("device-image").value.trim();
 
+        // Array mit Kat-ID
+        const categories = [...document.querySelectorAll('input[name="categories"]:checked')]
+            .map(checkbox => parseInt(checkbox.value));
+        if (categories.length === 0) {
+            alert("Bitte wähle mindestens eine Kategorie aus.");
+            return;
+        }
+
+        let imageName = document.getElementById("device-image").value.trim();
         // Falls der Benutzer keine Dateiendung (.png, .jpg, .jpeg) angibt, füge .png hinzu
         if (imageName && !imageName.includes(".")) {
             imageName += ".png";
@@ -359,9 +412,9 @@ function setupCRUD() {
 
         // Wenn ID übergeben wird, dann update, sonst add
         if (id) {
-            updateDevice(id, name, type, power, room, category, image);
+            updateDevice(id, name, type, power, room, categories, image);
         } else {
-            addDevice(name, type, power, room, category, image);
+            addDevice(name, type, power, room, categories, image);
         }
 
         // Felder zurücksetzen
@@ -434,7 +487,7 @@ async function loadSearchResults() {
             <td>${device.type}</td>
             <td>${device.power} W</td>
             <td>${device.room}</td>
-            <td>${device.category}</td>
+            <td>${device.categories.map(cat => cat.name).join(", ")}</td>
             <td>
                 <button onclick="editDevice(${device.id})" class="btn-edit">Bearbeiten</button>
                 <button onclick="deleteDevice(${device.id})" class="btn-delete">Löschen</button>
@@ -472,6 +525,20 @@ async function loadEditForm() {
     document.getElementById("device-category").value = device.category;
     document.getElementById("device-image").value = device.image;
 
+    await loadCategories();
+
+    setTimeout(() => {
+        const categoryCheckboxes = document.querySelectorAll('input[name="categories"]');
+
+        device.categories.forEach(category => {
+            categoryCheckboxes.forEach(checkbox => {
+                if (parseInt(checkbox.value) === category.id) {
+                    checkbox.checked = true;
+                }
+            });
+        });
+    }, 500);
+
     document.getElementById("form-title").textContent = "Gerät bearbeiten";
     document.getElementById("edit-btn").textContent = "bearbeiten";
 }
@@ -493,6 +560,7 @@ async function loadDeviceDetails() {
         document.getElementById("device_title").textContent = "Gerät nicht gefunden.";
         return;
     }
+    const categoryNames = device.categories.map(cat => cat.name).join(", ");
 
     // Gerätedetails in die Seite einfügen
     document.getElementById("device_title").textContent = device.name;
@@ -500,7 +568,7 @@ async function loadDeviceDetails() {
     document.getElementById("typ").textContent = device.type;
     document.getElementById("power").textContent = device.power ? `${device.power} Watt` : "Unbekannt";
     document.getElementById("room").textContent = device.room;
-    document.getElementById("category").textContent = device.category;
+    document.getElementById("category").textContent = categoryNames;
 
     // Bearbeiten-Link aktualisieren
     document.getElementById("edit-link").href = `edit.html?id=${device.id}`;
@@ -526,7 +594,9 @@ async function loadDevicesOnIndex() {
 
     devices.forEach(device => {
         const deviceElement = document.createElement("div");
+        const categoryNames = device.categories.map(cat => cat.name).join(", ");
         deviceElement.classList.add("container-item");
+
         deviceElement.innerHTML = `
             <section class="image-section">
                 <img src="${device.image || 'images/default.png'}" alt="${device.name}" aria-label="${device.name}">
@@ -534,7 +604,7 @@ async function loadDevicesOnIndex() {
             <div class="device-info">
                 <h3>${device.name}</h3>
                 <p><strong>Leistung:</strong> ${device.power} W</p>
-                <p><strong>Kategorie:</strong> ${device.category}</p>
+                <p><strong>Kategorie:</strong> ${categoryNames}</p>
                 <a href="detail.html?id=${device.id}" class="btn-details">Mehr Details</a>
             </div>
         `;

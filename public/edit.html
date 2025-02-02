@@ -20,15 +20,8 @@
         <input type="number" id="device-power" placeholder="Leistung in Watt"
                required minlength="1">
         <input type="text" id="device-room" placeholder="Raum" required minlength="3" pattern="[A-Za-zÄÖÜäöüß\s]+" title="Nur Buchstaben und Leerzeichen erlaubt.">
-        <select id="device-category" required>
-            <option value="">Kategorie wählen...</option>
-            <option value="Beleuchtung">Beleuchtung</option>
-            <option value="Überwachung">Überwachung</option>
-            <option value="Sicherheit">Sicherheit</option>
-            <option value="Steuerung">Steuerung</option>
-            <option value="Klima">Klima</option>
-            <option value="Multimedia">Multimedia</option>
-        </select>
+        <label>Kategorien:</label>
+        <div id="category-options"></div>
         <input type="text" id="device-image" placeholder="Bild-URL (z. B. images/lampe.png)">
         <button type="submit" id="edit-btn">Hinzufügen</button>
     </form>
