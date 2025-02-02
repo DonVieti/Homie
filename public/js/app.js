@@ -341,7 +341,7 @@ async function loadDevices() {
 }
 
 // Mittels ID Gerät aktualisieren(put)
-async function updateDevice(id, name, type, power, room, category, image) {
+async function updateDevice(id, name, type, power, room, categories, image) {
     try {
         const existingDevice = await getDeviceById(id);
         if (!existingDevice) {
@@ -358,7 +358,7 @@ async function updateDevice(id, name, type, power, room, category, image) {
                 type,
                 power,
                 room,
-                category,
+                categories,
                 image
             }),
         });
