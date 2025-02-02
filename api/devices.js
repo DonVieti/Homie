@@ -9,49 +9,16 @@ export default async function handler(req, res) {
     try {
         // Tabelle devices abrufen
         if (req.method === 'GET') {
-            console.log("🔍 Anfrage erhalten:", req.query); // DEBUG: Logge die Query-Parameter
-
-            const { id } = req.query;
-
-            if (id) {
-                console.log("🔍 Einzelnes Gerät wird geladen:", id); // DEBUG
-
-                const deviceResult = await db.execute('SELECT * FROM devices WHERE id = ?', [id]);
-
-                if (deviceResult.rows.length === 0) {
-                    console.log("❌ Gerät nicht gefunden:", id);
-                    return res.status(404).json({ error: "Gerät nicht gefunden" });
-                }
-
-                const device = deviceResult.rows[0];
-
-                // Kategorien für dieses Gerät abrufen
-                const categoriesResult = await db.execute(`
-            SELECT c.id AS category_id, c.name AS category_name
-            FROM device_category dc 
-            JOIN category c ON dc.category_id = c.id
-            WHERE dc.device_id = ?
-        `, [id]);
-
-                console.log("✅ Kategorien gefunden:", categoriesResult.rows); // DEBUG
-
-                return res.status(200).json({
-                    ...device,
-                    categories: categoriesResult.rows.map(cat => ({
-                        id: cat.category_id,
-                        name: cat.category_name
-                    }))
-                });
-            }
-
-            console.log("🔍 Alle Geräte werden geladen"); // DEBUG
+            // Geräte abrufen
             const devices = await db.execute('SELECT * FROM devices');
+            // Kategorien abrufen
             const deviceCategoryMap = await db.execute(`
-                SELECT dc.device_id, c.id AS category_id, c.name AS category_name
-                FROM device_category dc
-                         JOIN category c ON dc.category_id = c.id
+                SELECT dc.device_id, c.id AS category_id, c.name AS category_name 
+                FROM device_category dc 
+                JOIN category c ON dc.category_id = c.id
             `);
 
+            // Kategorien zuordnen
             const devicesWithCategories = devices.rows.map(device => ({
                 ...device,
                 categories: deviceCategoryMap.rows
@@ -59,7 +26,6 @@ export default async function handler(req, res) {
                     .map(dc => ({ id: dc.category_id, name: dc.category_name }))
             }));
 
-            console.log("✅ Alle Geräte mit Kategorien geladen"); // DEBUG
             return res.status(200).json(devicesWithCategories);
         }
 
