@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (path.includes("edit.html") && deviceId !== null) {
         loadEditForm();
     }
-    const categoryId = urlParams.get("category");
+    const categoryId = urlParams.get("id");
 
     if (path.includes("categories.html")) {
         if (categoryId) {
@@ -613,7 +613,7 @@ async function loadDevicesOnIndex() {
         deviceElement.classList.add("container-item");
 
         const categoryLinks = device.categories
-            .map(cat => `<a href="categories.html?category=${cat.id}" class="category-link">${cat.name}</a>`)
+            .map(cat => `<a href="categories.html?id=${cat.id}" class="category-link">${cat.name}</a>`)
             .join(", ");
 
         deviceElement.innerHTML = `
@@ -820,7 +820,6 @@ async function loadCategoriesOnCategories() {
         categories.forEach(category => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${category.id}</td>
                 <td>${category.name}</td>
                 <td>${category.device_count || 0}</td>
                 <td>
