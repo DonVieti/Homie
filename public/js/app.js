@@ -593,7 +593,7 @@ async function loadDeviceDetails() {
     document.getElementById("typ").textContent = device.type;
     document.getElementById("power").textContent = device.power ? `${device.power} Watt` : "Unbekannt";
     document.getElementById("room").textContent = device.room;
-    document.getElementById("category").textContent = categoryLinks;
+    document.getElementById("category").innerHTML = categoryLinks;
 
     // Bearbeiten-Link aktualisieren
     document.getElementById("edit-link").href = `edit.html?id=${device.id}`;
