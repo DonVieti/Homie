@@ -679,40 +679,6 @@ async function editCategory(id) {
     }
 }
 
-
-// Speichert die neue Kategorie
-async function saveCategoryEdit(id, newName) {
-    newName = newName.trim();
-    const validNamePattern = /^[A-Za-zÄÖÜäöüß\s]+$/;
-
-    if (!newName) {
-        alert("Der Kategoriename darf nicht leer sein.");
-        loadCategoriesOnAdmin();
-        return;
-    }
-
-    if (!validNamePattern.test(newName)) {
-        alert("Der Kategoriename darf nur Buchstaben und Leerzeichen enthalten.");
-        loadCategoriesOnAdmin();
-        return;
-    }
-
-    try {
-        const response = await fetch("/api/categories", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id, name: newName })
-        });
-
-        if (!response.ok) throw new Error("Fehler beim Aktualisieren der Kategorie");
-
-        loadCategoriesOnAdmin();
-    } catch (error) {
-        console.error("Fehler beim Bearbeiten der Kategorie:", error);
-    }
-}
-
-
 async function deleteCategory(id) {
     if (!confirm("Möchtest du diese Kategorie wirklich löschen?")) return;
 
@@ -804,7 +770,7 @@ async function setupCategoryCRUD() {
 
             if (!response.ok) throw new Error("Fehler beim Speichern der Kategorie");
 
-            loadCategories();
+            loadCategoriesOnAdmin();
             form.reset();
             document.getElementById("form-title").textContent = "Kategorie hinzufügen";
 
