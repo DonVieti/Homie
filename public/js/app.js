@@ -835,6 +835,7 @@ async function loadCategoriesOnCategories() {
 }
 
 async function loadDevicesByCategory(categoryId) {
+    mainElement.innerHTML = "";
     const devices = await fetchDevices();
     const mainElement = document.querySelector("main.content");
     const container = document.createElement("div");
