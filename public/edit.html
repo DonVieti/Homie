@@ -15,11 +15,13 @@
     <h1 id="form-title">Gerät hinzufügen</h1>
     <form id="device-form">
         <input type="hidden" id="device-id">
-        <input type="text" id="device-name" placeholder="Gerätename" required minlength="3">
-        <input type="text" id="device-type" placeholder="Gerätetyp (z. B. Lampe, Steckdose)" required minlength="3" pattern="[A-Za-zÄÖÜäöüß\s]+" title="Nur Buchstaben und Leerzeichen erlaubt.">
-        <input type="number" id="device-power" placeholder="Leistung in Watt"
-               required minlength="1">
-        <input type="text" id="device-room" placeholder="Raum" required minlength="3" pattern="[A-Za-zÄÖÜäöüß\s]+" title="Nur Buchstaben und Leerzeichen erlaubt.">
+        <input type="text" id="device-name" placeholder="Gerätename" required minlength="3"
+               pattern="[A-Za-zÄÖÜäöüß\s\-_]+">
+        <input type="text" id="device-type" placeholder="Gerätetyp (z. B. Lampe, Steckdose)" required
+               minlength="3" pattern="[A-Za-zÄÖÜäöüß\s\-_]+" title="Nur Buchstaben und Leerzeichen erlaubt.">
+        <input type="number" id="device-power" placeholder="Leistung in Watt" required minlength="1">
+        <input type="text" id="device-room" placeholder="Raum" required minlength="3"
+               pattern="[A-Za-zÄÖÜäöüß\s]+" title="Nur Buchstaben und Leerzeichen erlaubt.">
         <label>Kategorien:</label>
         <div id="category-options"></div>
         <input type="text" id="device-image" placeholder="Bild-URL (z. B. images/lampe.png)">
@@ -30,7 +32,7 @@
     <table>
         <thead>
         <tr>
-            <th> </th>
+            <th></th>
             <th>Name</th>
             <th>Typ</th>
             <th>Leistung</th>

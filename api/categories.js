@@ -1,4 +1,4 @@
-import { createClient } from '@libsql/client';
+import {createClient} from '@libsql/client';
 
 const db = createClient({
     url: process.env.TURSO_DATABASE_URL,
@@ -11,8 +11,11 @@ export default async function handler(req, res) {
         if (req.method === 'GET') {
             // Alle Kategorien abrufen mit der Anzahl der Geräte
             const categories = await db.execute(`
-                SELECT category.id, category.name,
-                       (SELECT COUNT(*) FROM device_category WHERE device_category.category_id = category.id) AS device_count
+                SELECT category.id,
+                       category.name,
+                       (SELECT COUNT(*)
+                        FROM device_category
+                        WHERE device_category.category_id = category.id) AS device_count
                 FROM category
             `);
             return res.status(200).json(categories.rows);
@@ -21,23 +24,23 @@ export default async function handler(req, res) {
         // Kategorie hinzufügen
         if (req.method === 'POST') {
             // dummy füllen
-            const { name } = req.body;
+            const {name} = req.body;
 
             if (!name) {
-                return res.status(400).json({ error: 'Name ist erforderlich' });
+                return res.status(400).json({error: 'Name ist erforderlich'});
             }
 
             await db.execute('INSERT INTO category (name) VALUES (?)', [name]);
-            return res.status(201).json({ message: 'Kategorie hinzugefügt' });
+            return res.status(201).json({message: 'Kategorie hinzugefügt'});
         }
 
         // Kategorie entfernen
         if (req.method === 'DELETE') {
             // dummy füllen
-            const { id } = req.body;
+            const {id} = req.body;
 
             if (!id || isNaN(parseInt(id))) {
-                return res.status(400).json({ error: 'Ungültige oder fehlende ID' });
+                return res.status(400).json({error: 'Ungültige oder fehlende ID'});
             }
 
             // Prüfen ob Gerät mit Kategorie
@@ -47,24 +50,24 @@ export default async function handler(req, res) {
             );
             // Kat existiert, aber verknüpft
             if (count.rows[0].count > 0) {
-                return res.status(400).json({ error: 'Kategorie ist mit Geräten verknüpft und kann nicht gelöscht werden' });
+                return res.status(400).json({error: 'Kategorie ist mit Geräten verknüpft und kann nicht gelöscht werden'});
             }
             // Kat entfernen
             const result = await db.execute('DELETE FROM category WHERE id = ?', [id]);
 
             if (result.rowsAffected === 0) {
-                return res.status(404).json({ error: 'Kategorie nicht gefunden' });
+                return res.status(404).json({error: 'Kategorie nicht gefunden'});
             }
 
-            return res.status(200).json({ message: 'Kategorie gelöscht' });
+            return res.status(200).json({message: 'Kategorie gelöscht'});
         }
 
         if (req.method === 'PUT') {
             // dummy füllen
-            const { id, name } = req.body;
+            const {id, name} = req.body;
             // prüfen ob Werte gültig
             if (!id || !name) {
-                return res.status(400).json({ error: 'ID und Name sind erforderlich' });
+                return res.status(400).json({error: 'ID und Name sind erforderlich'});
             }
             // Prepared Statement update
             const result = await db.execute(
@@ -73,15 +76,15 @@ export default async function handler(req, res) {
             );
 
             if (result.rowsAffected === 0) {
-                return res.status(404).json({ error: 'Kategorie nicht gefunden' });
+                return res.status(404).json({error: 'Kategorie nicht gefunden'});
             }
 
-            return res.status(200).json({ message: 'Kategorie aktualisiert' });
+            return res.status(200).json({message: 'Kategorie aktualisiert'});
         }
 
-        return res.status(405).json({ error: 'Methode nicht erlaubt' });
+        return res.status(405).json({error: 'Methode nicht erlaubt'});
     } catch (error) {
         console.error('Fehler in der API:', error);
-        return res.status(500).json({ error: 'Interner Serverfehler', details: error.message });
+        return res.status(500).json({error: 'Interner Serverfehler', details: error.message});
     }
 }

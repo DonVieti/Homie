@@ -116,7 +116,7 @@ main {
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     padding: 15px;
     margin-bottom: 15px;
-    width:90vh;
+    width: 90vh;
     text-align: center;
 
 }
@@ -282,12 +282,12 @@ footer {
 
 }
 
-.detail-buttons .btn-edit,.btn-edit{
+.detail-buttons .btn-edit, .btn-edit {
     background-color: #4CAF50;
     color: white;
 }
 
-.detail-buttons .btn-delete, .btn-delete{
+.detail-buttons .btn-delete, .btn-delete {
     background-color: #f44336;
     color: white;
 }
@@ -297,7 +297,7 @@ footer {
     color: white;
 }
 
-.btn-edit,.btn-delete {
+.btn-edit, .btn-delete {
     padding: 5px 10px;
     border: none;
     border-radius: 5px;
@@ -371,7 +371,7 @@ footer {
     top: 170%;
     right: -30%;
     border-radius: 10px;
-    padding:5px;
+    padding: 5px;
 }
 
 .search-container.active #search-filter-wrapper {
@@ -426,7 +426,8 @@ h4 {
 #contact-content {
     text-align: center;
 }
-.contact-btn-back{
+
+.contact-btn-back {
     padding: 10px 20px;
     background-color: #339fff;
     color: white;
@@ -435,16 +436,17 @@ h4 {
     font-size: 1.2rem;
 }
 
-.search-table{
+.search-table {
     gap: 10px;
 
 }
-.search-table thead{
+
+.search-table thead {
     text-align: center;
     background-color: #d3ecff;
 }
 
-.search-table td{
+.search-table td {
     padding: 5px;
 }
 

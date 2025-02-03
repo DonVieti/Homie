@@ -159,6 +159,7 @@ function initializeFiltering() {
             }
         }
     }
+
     if (searchField) {
         searchField.addEventListener("keydown", filterOnEnter);
     }
@@ -175,9 +176,9 @@ async function loadCategories() {
     try {
         const response = await fetch('/api/categories');
 
-        // 🔥 Falls die API nicht mit Status 200 antwortet, werfe Fehler
+
         if (!response.ok) {
-            const errorText = await response.text(); // 🔥 Fehlertext abrufen
+            const errorText = await response.text();
             throw new Error(`Fehler ${response.status}: ${errorText}`);
         }
 
@@ -199,7 +200,7 @@ async function loadCategories() {
             categoryContainer.appendChild(label);
         });
     } catch (error) {
-        console.error('❌ Fehler beim Laden der Kategorien:', error);
+        console.error('Fehler beim Laden der Kategorien:', error);
         alert(`Fehler beim Laden der Kategorien: ${error.message}`);
     }
 }
@@ -332,8 +333,8 @@ async function loadDevices() {
             <td>${device.room}</td>
             <td>${categoryNames}</td>
             <td>
-                <button onclick="editDevice(${device.id})"class="btn-edit">Bearbeiten</button>
-                <button onclick="deleteDevice(${device.id})"class="btn-delete">Löschen</button>
+                <button onclick="editDevice(${device.id})" class="btn-edit">Bearbeiten</button>
+                <button onclick="deleteDevice(${device.id})" class="btn-delete">Löschen</button>
             </td>
         `;
         deviceList.appendChild(row);
@@ -367,6 +368,7 @@ async function updateDevice(id, name, type, power, room, categories, image) {
         console.error("Fehler beim Aktualisieren des Geräts:", error);
     }
 }
+
 // Gerät hinzufügen mittels post
 async function addDevice(name, type, power, room, categories, image) {
     try {
@@ -434,7 +436,7 @@ async function loadSearchResults() {
     const powerMin = urlParams.get("powermin") ? parseInt(urlParams.get("powermin"), 10) : 0;
     const powerMax = urlParams.get("powermax") ? parseInt(urlParams.get("powermax"), 10) : Infinity;
 
-    // wenn keine Eingabe, suche leer
+    // wenn keine Eingabe, Suche leer
     if (!searchQuery && powerMin === 0 && powerMax === Infinity) {
         document.querySelector("h1").textContent = "Keine Suchanfrage angegeben.";
         return;
@@ -465,9 +467,10 @@ async function loadSearchResults() {
             device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             device.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
             device.room.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            device.category.toLowerCase().includes(searchQuery.toLowerCase());
+            device.categories.some(cat => cat.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
-        const devicePower = parseInt(device.power, 10) || 0; // Sicherstellen, dass es eine Zahl ist
+        // Sicherstellen, dass es eine Zahl ist
+        const devicePower = parseInt(device.power, 10) || 0;
         const matchesPower = devicePower >= powerMin && devicePower <= powerMax;
 
         return matchesSearch && matchesPower;

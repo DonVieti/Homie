@@ -1,4 +1,4 @@
-import { createClient } from '@libsql/client';
+import {createClient} from '@libsql/client';
 
 const db = createClient({
     url: process.env.TURSO_DATABASE_URL,
@@ -13,9 +13,9 @@ export default async function handler(req, res) {
             const devices = await db.execute('SELECT * FROM devices');
             // Kategorien abrufen
             const deviceCategoryMap = await db.execute(`
-                SELECT dc.device_id, c.id AS category_id, c.name AS category_name 
-                FROM device_category dc 
-                JOIN category c ON dc.category_id = c.id
+                SELECT dc.device_id, c.id AS category_id, c.name AS category_name
+                FROM device_category dc
+                         JOIN category c ON dc.category_id = c.id
             `);
 
             // Kategorien zuordnen
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
                 ...device,
                 categories: deviceCategoryMap.rows
                     .filter(dc => dc.device_id === device.id)
-                    .map(dc => ({ id: dc.category_id, name: dc.category_name }))
+                    .map(dc => ({id: dc.category_id, name: dc.category_name}))
             }));
 
             return res.status(200).json(devicesWithCategories);
@@ -31,11 +31,11 @@ export default async function handler(req, res) {
 
         if (req.method === 'POST') {
             // dummy füllen
-            const { name, type, power, room, categories, image } = req.body;
+            const {name, type, power, room, categories, image} = req.body;
 
             // prüfen ob alle Werte gültig
             if (!name || !type || !power || !room || !categories || !image) {
-                return res.status(400).json({ error: 'Alle Felder sind erforderlich' });
+                return res.status(400).json({error: 'Alle Felder sind erforderlich'});
             }
 
             // Prepared Statement insert
@@ -53,16 +53,16 @@ export default async function handler(req, res) {
                 );
             }
 
-            return res.status(201).json({ message: 'Gerät hinzugefügt' });
+            return res.status(201).json({message: 'Gerät hinzugefügt'});
         }
 
         if (req.method === 'DELETE') {
             // dummy mittels id
-            const { id } = req.body;
+            const {id} = req.body;
 
             // prüfen ob Wert gültig
             if (!id || isNaN(parseInt(id))) {
-                return res.status(400).json({ error: 'Ungültige oder fehlende ID' });
+                return res.status(400).json({error: 'Ungültige oder fehlende ID'});
             }
             // Erst verknüpfung gerät-kategorie
             await db.execute('DELETE FROM device_category WHERE device_id = ?', [id]);
@@ -71,18 +71,18 @@ export default async function handler(req, res) {
 
             // wenn result kein wert zurückgibt, id falsch
             if (result.rowsAffected === 0) {
-                return res.status(404).json({ error: 'Gerät nicht gefunden' });
+                return res.status(404).json({error: 'Gerät nicht gefunden'});
             }
-            return res.status(200).json({ message: 'Gerät gelöscht' });
+            return res.status(200).json({message: 'Gerät gelöscht'});
         }
 
         if (req.method === 'PUT') {
             // dummy füllen
-            const { id, name, type, power, room, categories, image } = req.body;
+            const {id, name, type, power, room, categories, image} = req.body;
 
             // prüfen ob Werte gültig
             if (!id || !name || !type || !power || !room || !categories || !image) {
-                return res.status(400).json({ error: 'Alle Felder sind erforderlich' });
+                return res.status(400).json({error: 'Alle Felder sind erforderlich'});
             }
             // Prepared Statement update
             const result = await db.execute(
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
 
             // wenn result kein wert zurückgibt, id falsch
             if (result.rowsAffected === 0) {
-                return res.status(404).json({ error: 'Gerät nicht gefunden' });
+                return res.status(404).json({error: 'Gerät nicht gefunden'});
             }
             // Alte Kategorien entfernen
             await db.execute('DELETE FROM device_category WHERE device_id = ?', [id]);
@@ -104,14 +104,14 @@ export default async function handler(req, res) {
                 );
             }
 
-            return res.status(200).json({ message: 'Gerät aktualisiert' });
+            return res.status(200).json({message: 'Gerät aktualisiert'});
         }
 
         // unbekannte methode genutzt
-        return res.status(405).json({ error: 'Methode nicht erlaubt' });
+        return res.status(405).json({error: 'Methode nicht erlaubt'});
 
     } catch (error) {
         console.error('Fehler in der API:', error);
-        return res.status(500).json({ error: 'Interner Serverfehler' });
+        return res.status(500).json({error: 'Interner Serverfehler'});
     }
 }
