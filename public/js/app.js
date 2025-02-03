@@ -20,6 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (path.includes("detail.html")) {
         loadDeviceDetails();
     }
+    if (path.includes("admin.html")) {
+        loadCategoriesOnAdmin();
+    }
 
     if (path.includes("kontakt.html")) {
         try {
@@ -653,6 +656,129 @@ async function getValidImage(imageName) {
             resolve("images/default.png");
         };
     });
+}
+
+// Kategorie
+async function editCategory(id) {
+    const categoryNameSpan = document.getElementById(`category-name-${id}`);
+    if (!categoryNameSpan) return;
+
+    const currentName = categoryNameSpan.textContent;
+
+    // Ersetze den Text mit einem Eingabefeld
+    categoryNameSpan.innerHTML = `<input type="text" id="edit-input-${id}" value="${currentName}" autofocus>`;
+
+    const inputField = document.getElementById(`edit-input-${id}`);
+
+    // Validierung beim Tippen
+    inputField.addEventListener("input", () => {
+        const validNamePattern = /^[A-Za-zÄÖÜäöüß\s]+$/;
+        if (!validNamePattern.test(inputField.value)) {
+            // Markiert Fehler
+            inputField.style.border = "2px solid red";
+        } else {
+            // Entfernt Fehler-Markierung
+            inputField.style.border = "";
+        }
+    });
+
+    // Warte auf Enter oder Klick außerhalb des Feldes
+    inputField.addEventListener("blur", async () => await saveCategoryEdit(id, inputField.value));
+    inputField.addEventListener("keydown", async (event) => {
+        if (event.key === "Enter") {
+            await saveCategoryEdit(id, inputField.value);
+        }
+    });
+}
+
+
+// Speichert die neue Kategorie
+async function saveCategoryEdit(id, newName) {
+    newName = newName.trim();
+    const validNamePattern = /^[A-Za-zÄÖÜäöüß\s]+$/;
+
+    if (!newName) {
+        alert("Der Kategoriename darf nicht leer sein.");
+        loadCategoriesOnAdmin();
+        return;
+    }
+
+    if (!validNamePattern.test(newName)) {
+        alert("Der Kategoriename darf nur Buchstaben und Leerzeichen enthalten.");
+        loadCategoriesOnAdmin();
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/categories", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, name: newName })
+        });
+
+        if (!response.ok) throw new Error("Fehler beim Aktualisieren der Kategorie");
+
+        loadCategoriesOnAdmin();
+    } catch (error) {
+        console.error("Fehler beim Bearbeiten der Kategorie:", error);
+    }
+}
+
+
+async function deleteCategory(id) {
+    if (!confirm("Möchtest du diese Kategorie wirklich löschen?")) return;
+
+    try {
+        const response = await fetch("/api/categories", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.error || "Fehler beim Löschen der Kategorie");
+            return;
+        }
+
+        loadCategoriesOnAdmin();
+    } catch (error) {
+        console.error("Fehler beim Löschen der Kategorie:", error);
+    }
+}
+
+
+async function loadCategoriesOnAdmin() {
+    const categoryList = document.getElementById("category-list");
+    if (!categoryList) return;
+
+    try {
+        const response = await fetch("/api/categories");
+        if (!response.ok) throw new Error("Fehler beim Laden der Kategorien");
+
+        const categories = await response.json();
+
+        // Liste zurücksetzen
+        categoryList.innerHTML = "";
+
+        // Tabelle mit Liste ausfüllen
+        categories.forEach(category => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${category.id}</td>
+                <td>${category.name}</td>
+                <td>${category.device_count || 0}</td>
+                <td>
+                    <button onclick="editCategory(${category.id})" class="btn-edit">Bearbeiten</button>
+                    <button onclick="deleteCategory(${category.id})" class="btn-delete">Löschen</button>
+                </td>
+            `;
+            categoryList.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Fehler beim Laden der Kategorien:", error);
+    }
 }
 
 
