@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
             path.includes("edit.html") ||
             path.includes("search.html") ||
             path.includes("impressum.html") ||
-            path.includes("admin.html")
+            path.includes("categories.html")
         )
     ) {
         loadDevicesOnIndex();
@@ -21,8 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (path.includes("detail.html")) {
         loadDeviceDetails();
     }
-    if (path.includes("admin.html")) {
-        loadCategoriesOnAdmin();
+    if (path.includes("categories.html")) {
+        loadCategoriesOnCategories();
         setupCategoryCRUD();
     }
 
@@ -312,6 +312,7 @@ async function deleteDevice(id) {
             alert(device.name + " wurde gelöscht. Zurück zur Startseite.");
             window.location.href = "index.html";
         } else {
+            alert(device.name + " wurde gelöscht.");
             loadDevices();
         }
     }
@@ -602,8 +603,11 @@ async function loadDevicesOnIndex() {
 
     devices.forEach(device => {
         const deviceElement = document.createElement("div");
-        const categoryNames = device.categories.map(cat => cat.name).join(", ");
         deviceElement.classList.add("container-item");
+
+        const categoryLinks = device.categories
+            .map(cat => `<a href="categories.html?category=${cat.id}" class="category-link">${cat.name}</a>`)
+            .join(", ");
 
         deviceElement.innerHTML = `
             <section class="image-section">
@@ -612,7 +616,7 @@ async function loadDevicesOnIndex() {
             <div class="device-info">
                 <h3>${device.name}</h3>
                 <p><strong>Leistung:</strong> ${device.power} W</p>
-                <p><strong>Kategorie:</strong> ${categoryNames}</p>
+                 <p><strong>Kategorie:</strong> ${categoryLinks}</p>
                 <a href="detail.html?id=${device.id}" class="btn-details">Mehr Details</a>
             </div>
         `;
@@ -707,7 +711,8 @@ async function deleteCategory(id) {
             alert(result.error || "Fehler beim Löschen der Kategorie");
             return;
         }
-        loadCategoriesOnAdmin();
+        alert(category.name + " wurde gelöscht.");
+        loadCategoriesOnCategories();
     } catch (error) {
         console.error("Fehler beim Löschen der Kategorie:", error);
     }
@@ -780,7 +785,7 @@ async function setupCategoryCRUD() {
 
             if (!response.ok) throw new Error("Fehler beim Speichern der Kategorie");
 
-            loadCategoriesOnAdmin();
+            loadCategoriesOnCategories();
             form.reset();
             document.getElementById("category-id").value = "";
             document.getElementById("form-title").textContent = "Kategorie hinzufügen";
@@ -791,7 +796,7 @@ async function setupCategoryCRUD() {
     });
 }
 
-async function loadCategoriesOnAdmin() {
+async function loadCategoriesOnCategories() {
     const categoryList = document.getElementById("category-list");
     if (!categoryList) return;
 
@@ -823,6 +828,67 @@ async function loadCategoriesOnAdmin() {
     }
 }
 
+async function loadDevicesByCategory() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryId = urlParams.get("category"); // 🔥 Kategorie-ID aus URL holen
+
+    const devices = await fetchDevices(); // 🔥 Alle Geräte abrufen
+    const mainElement = document.querySelector("main.content"); // Hauptbereich
+    const container = document.createElement("div"); // Neuer Container für Geräte
+    container.id = "device-container"; // ID setzen
+
+    if (!mainElement) {
+        console.warn("❌ Fehler: <main class='content'> nicht gefunden!");
+        return;
+    }
+
+    // 🔹 Falls `categoryId` gesetzt ist → Geräte filtern
+    const filteredDevices = categoryId
+        ? devices.filter(device => device.categories.some(cat => cat.id == categoryId))
+        : devices; // Falls keine Kategorie gewählt wurde, alle anzeigen
+
+    // 🔹 Kategorie-Namen holen (nur wenn eine Kategorie-ID existiert)
+    let categoryName = "Alle Geräte";
+    if (categoryId) {
+        const response = await fetch("/api/categories");
+        if (response.ok) {
+            const categories = await response.json();
+            const selectedCategory = categories.find(cat => cat.id == categoryId);
+            categoryName = selectedCategory ? selectedCategory.name : "Unbekannte Kategorie";
+        }
+    }
+
+    // 🔹 <main> neu setzen
+    mainElement.innerHTML = `
+        <h1>Geräte der Kategorie: ${categoryName}</h1>
+    `; // Container wird später eingefügt
+
+    if (filteredDevices.length === 0) {
+        container.innerHTML = "<p>Keine Geräte in dieser Kategorie gefunden.</p>";
+    } else {
+        filteredDevices.forEach(device => {
+            const categoryNames = device.categories?.map(cat => cat.name).join(", ") || "Keine Kategorie";
+            const deviceElement = document.createElement("div");
+            deviceElement.classList.add("container-item");
+
+            deviceElement.innerHTML = `
+                <section class="image-section">
+                    <img src="${device.image || 'images/default.png'}" alt="${device.name}" aria-label="${device.name}">
+                </section>
+                <div class="device-info">
+                    <h3>${device.name}</h3>
+                    <p><strong>Leistung:</strong> ${device.power} W</p>
+                    <p><strong>Kategorie:</strong> ${categoryNames}</p>
+                    <a href="detail.html?id=${device.id}" class="btn-details">Mehr Details</a>
+                </div>
+            `;
+
+            container.appendChild(deviceElement);
+        });
+    }
+
+    mainElement.appendChild(container); // 🔥 Container mit Geräten einfügen
+}
 
 
 
