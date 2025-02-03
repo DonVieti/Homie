@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (path.includes("admin.html")) {
         loadCategoriesOnAdmin();
+        setupCategoryCRUD();
     }
 
     if (path.includes("kontakt.html")) {
@@ -660,35 +661,21 @@ async function getValidImage(imageName) {
 
 // Kategorie
 async function editCategory(id) {
-    const categoryNameSpan = document.getElementById(`category-name-${id}`);
-    if (!categoryNameSpan) return;
+    try {
+        const response = await fetch(`/api/categories/${id}`);
+        if (!response.ok) throw new Error("Kategorie nicht gefunden");
 
-    const currentName = categoryNameSpan.textContent;
+        const category = await response.json();
 
-    // Ersetze den Text mit einem Eingabefeld
-    categoryNameSpan.innerHTML = `<input type="text" id="edit-input-${id}" value="${currentName}" autofocus>`;
+        // 🔹 Formular mit Kategorie-Daten füllen
+        document.getElementById("category-id").value = category.id; // Kategorie-ID setzen
+        document.getElementById("category-name").value = category.name; // Name setzen
+        document.getElementById("form-title").textContent = "Kategorie bearbeiten";
 
-    const inputField = document.getElementById(`edit-input-${id}`);
-
-    // Validierung beim Tippen
-    inputField.addEventListener("input", () => {
-        const validNamePattern = /^[A-Za-zÄÖÜäöüß\s]+$/;
-        if (!validNamePattern.test(inputField.value)) {
-            // Markiert Fehler
-            inputField.style.border = "2px solid red";
-        } else {
-            // Entfernt Fehler-Markierung
-            inputField.style.border = "";
-        }
-    });
-
-    // Warte auf Enter oder Klick außerhalb des Feldes
-    inputField.addEventListener("blur", async () => await saveCategoryEdit(id, inputField.value));
-    inputField.addEventListener("keydown", async (event) => {
-        if (event.key === "Enter") {
-            await saveCategoryEdit(id, inputField.value);
-        }
-    });
+    } catch (error) {
+        console.error("❌ Fehler beim Laden der Kategorie:", error);
+        alert("Fehler beim Bearbeiten der Kategorie.");
+    }
 }
 
 
@@ -748,6 +735,83 @@ async function deleteCategory(id) {
     }
 }
 
+async function loadCategoryList() {  // <-- Neuer Name, um Verwechslung zu vermeiden
+    const categoryList = document.getElementById("category-list");
+    if (!categoryList) return;
+
+    try {
+        const response = await fetch("/api/categories");
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Fehler ${response.status}: ${errorText}`);
+        }
+
+        const categories = await response.json();
+
+        // Liste zurücksetzen
+        categoryList.innerHTML = "";
+
+        categories.forEach(category => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${category.id}</td>
+                <td>${category.name}</td>
+                <td>${category.device_count || 0}</td>
+                <td>
+                    <button onclick="editCategory(${category.id})" class="btn-edit">Bearbeiten</button>
+                    <button onclick="deleteCategory(${category.id})" class="btn-delete">Löschen</button>
+                </td>
+            `;
+            categoryList.appendChild(row);
+        });
+    } catch (error) {
+        console.error("❌ Fehler beim Laden der Kategorien:", error);
+        alert(`Fehler beim Laden der Kategorien: ${error.message}`);
+    }
+}
+
+
+async function setupCategoryCRUD() {
+    const form = document.getElementById("device-form");
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const id = document.getElementById("category-id").value;
+        const name = document.getElementById("category-name").value.trim();
+
+        // 🔹 Validierung: Nur Buchstaben, Umlaute, Leerzeichen, - und _
+        const validNamePattern = /^[A-Za-zÄÖÜäöüß\s\-_]+$/;
+        if (!validNamePattern.test(name)) {
+            alert("Der Kategoriename darf nur Buchstaben, Leerzeichen, - und _ enthalten.");
+            return;
+        }
+
+        if (!name) {
+            alert("Bitte einen Kategorienamen eingeben.");
+            return;
+        }
+
+        try {
+            const method = id ? "PUT" : "POST"; // PUT für Update, POST für neue Kategorie
+            const response = await fetch("/api/categories", {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, name })
+            });
+
+            if (!response.ok) throw new Error("Fehler beim Speichern der Kategorie");
+
+            loadCategories();
+            form.reset();
+            document.getElementById("form-title").textContent = "Kategorie hinzufügen";
+
+        } catch (error) {
+            console.error("Fehler beim Speichern der Kategorie:", error);
+        }
+    });
+}
 
 async function loadCategoriesOnAdmin() {
     const categoryList = document.getElementById("category-list");
