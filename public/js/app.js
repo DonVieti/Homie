@@ -772,6 +772,7 @@ async function setupCategoryCRUD() {
 
             loadCategoriesOnAdmin();
             form.reset();
+            document.getElementById("category-id").value = "";
             document.getElementById("form-title").textContent = "Kategorie hinzufügen";
 
         } catch (error) {
