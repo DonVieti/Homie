@@ -21,10 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (path.includes("detail.html")) {
         loadDeviceDetails();
     }
-    if (path.includes("categories.html")) {
-        loadCategoriesOnCategories();
-        setupCategoryCRUD();
-    }
+
 
     if (path.includes("kontakt.html")) {
         try {
@@ -49,6 +46,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (path.includes("edit.html") && deviceId !== null) {
         loadEditForm();
+    }
+    const categoryId = urlParams.get("category");
+
+    if (path.includes("categories.html")) {
+        if (categoryId) {
+            loadDevicesByCategory();
+        } else {
+            loadCategoriesOnCategories();
+            setupCategoryCRUD();
+        }
     }
 
     // Kontaktnachricht bestätigen
@@ -830,24 +837,24 @@ async function loadCategoriesOnCategories() {
 
 async function loadDevicesByCategory() {
     const urlParams = new URLSearchParams(window.location.search);
-    const categoryId = urlParams.get("category"); // 🔥 Kategorie-ID aus URL holen
+    const categoryId = urlParams.get("category");
 
-    const devices = await fetchDevices(); // 🔥 Alle Geräte abrufen
-    const mainElement = document.querySelector("main.content"); // Hauptbereich
-    const container = document.createElement("div"); // Neuer Container für Geräte
-    container.id = "device-container"; // ID setzen
+    const devices = await fetchDevices();
+    const mainElement = document.querySelector("main.content");
+    const container = document.createElement("div");
+    container.id = "device-container";
 
     if (!mainElement) {
-        console.warn("❌ Fehler: <main class='content'> nicht gefunden!");
+        console.warn("Fehler: <main class='content'> nicht gefunden!");
         return;
     }
 
-    // 🔹 Falls `categoryId` gesetzt ist → Geräte filtern
+    // Geräte filtern
     const filteredDevices = categoryId
         ? devices.filter(device => device.categories.some(cat => cat.id == categoryId))
-        : devices; // Falls keine Kategorie gewählt wurde, alle anzeigen
+        : devices;
 
-    // 🔹 Kategorie-Namen holen (nur wenn eine Kategorie-ID existiert)
+    // Kategorie name
     let categoryName = "Alle Geräte";
     if (categoryId) {
         const response = await fetch("/api/categories");
@@ -858,10 +865,10 @@ async function loadDevicesByCategory() {
         }
     }
 
-    // 🔹 <main> neu setzen
+    // <main> neu setzen
     mainElement.innerHTML = `
         <h1>Geräte der Kategorie: ${categoryName}</h1>
-    `; // Container wird später eingefügt
+    `;
 
     if (filteredDevices.length === 0) {
         container.innerHTML = "<p>Keine Geräte in dieser Kategorie gefunden.</p>";
@@ -887,7 +894,7 @@ async function loadDevicesByCategory() {
         });
     }
 
-    mainElement.appendChild(container); // 🔥 Container mit Geräten einfügen
+    mainElement.appendChild(container);
 }
 
 
