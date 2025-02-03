@@ -11,7 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
             path.includes("kontakt.html") ||
             path.includes("edit.html") ||
             path.includes("search.html") ||
-            path.includes("impressum.html")
+            path.includes("impressum.html") ||
+            path.includes("admin.html")
         )
     ) {
         loadDevicesOnIndex();
@@ -667,13 +668,13 @@ async function editCategory(id) {
 
         const category = await response.json();
 
-        // 🔹 Formular mit Kategorie-Daten füllen
-        document.getElementById("category-id").value = category.id; // Kategorie-ID setzen
-        document.getElementById("category-name").value = category.name; // Name setzen
+
+        document.getElementById("category-id").value = category.id;
+        document.getElementById("category-name").value = category.name;
         document.getElementById("form-title").textContent = "Kategorie bearbeiten";
 
     } catch (error) {
-        console.error("❌ Fehler beim Laden der Kategorie:", error);
+        console.error("Fehler beim Laden der Kategorie:", error);
         alert("Fehler beim Bearbeiten der Kategorie.");
     }
 }
