@@ -672,6 +672,7 @@ async function editCategory(id) {
         document.getElementById("category-id").value = category.id;
         document.getElementById("category-name").value = category.name;
         document.getElementById("form-title").textContent = "Kategorie bearbeiten";
+        document.getElementById("edit-btn").textContent = "bearbeiten";
 
     } catch (error) {
         console.error("Fehler beim Laden der Kategorie:", error);
@@ -680,22 +681,32 @@ async function editCategory(id) {
 }
 
 async function deleteCategory(id) {
-    if (!confirm("Möchtest du diese Kategorie wirklich löschen?")) return;
-
     try {
-        const response = await fetch("/api/categories", {
+        // 🔹 Kategorienliste abrufen, um den Namen zu erhalten
+        const response = await fetch("/api/categories");
+        if (!response.ok) throw new Error("Kategorien konnten nicht geladen werden.");
+
+        const categories = await response.json();
+        const category = categories.find(cat => cat.id === id);
+
+        if (!category) {
+            alert("Kategorie nicht gefunden.");
+            return;
+        }
+        if (!confirm(`Möchtest du die Kategorie "${category.name}" wirklich löschen?`)) return;
+
+        const deleteResponse = await fetch("/api/categories", {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id })
         });
 
-        const result = await response.json();
+        const result = await deleteResponse.json();
 
-        if (!response.ok) {
+        if (!deleteResponse.ok) {
             alert(result.error || "Fehler beim Löschen der Kategorie");
             return;
         }
-
         loadCategoriesOnAdmin();
     } catch (error) {
         console.error("Fehler beim Löschen der Kategorie:", error);
@@ -754,7 +765,6 @@ async function setupCategoryCRUD() {
             alert("Der Kategoriename darf nur Buchstaben, Leerzeichen, - und _ enthalten.");
             return;
         }
-
         if (!name) {
             alert("Bitte einen Kategorienamen eingeben.");
             return;
