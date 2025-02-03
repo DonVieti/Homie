@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (path.includes("categories.html")) {
         if (categoryId) {
-            loadDevicesByCategory();
+            loadDevicesByCategory(categoryId);
         } else {
             loadCategoriesOnCategories();
             setupCategoryCRUD();
@@ -834,10 +834,7 @@ async function loadCategoriesOnCategories() {
     }
 }
 
-async function loadDevicesByCategory() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const categoryId = urlParams.get("category");
-
+async function loadDevicesByCategory(categoryId) {
     const devices = await fetchDevices();
     const mainElement = document.querySelector("main.content");
     const container = document.createElement("div");
