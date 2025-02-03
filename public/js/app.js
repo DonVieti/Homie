@@ -338,7 +338,9 @@ async function loadDevices() {
 
     // Tabelle mit Liste ausfüllen
     devices.forEach(device => {
-        const categoryNames = device.categories?.map(cat => cat.name).join(", ") || "Keine Kategorie";
+        const categoryNames = device.categories
+            .map(cat => `<a href="categories.html?id=${cat.id}" class="category-link">${cat.name}</a>`)
+            .join(", ");
         const row = document.createElement("tr");
         row.innerHTML = `
             <td><img src="${device.image}" alt="${device.name}" width="50"></td>
@@ -500,12 +502,15 @@ async function loadSearchResults() {
     // tabellenzeile tr mittels filtergebnis ausgeben
     filteredDevices.forEach(device => {
         const row = document.createElement("tr");
+        const categoryLinks = device.categories
+            .map(cat => `<a href="categories.html?id=${cat.id}" class="category-link">${cat.name}</a>`)
+            .join(", ");
         row.innerHTML = `
             <td>${device.name}</td>
             <td>${device.type}</td>
             <td>${device.power} W</td>
             <td>${device.room}</td>
-            <td>${device.categories.map(cat => cat.name).join(", ")}</td>
+            <td>${categoryLinks}</td>
             <td>
                 <button onclick="editDevice(${device.id})" class="btn-edit">Bearbeiten</button>
                 <button onclick="deleteDevice(${device.id})" class="btn-delete">Löschen</button>
@@ -578,7 +583,9 @@ async function loadDeviceDetails() {
         document.getElementById("device_title").textContent = "Gerät nicht gefunden.";
         return;
     }
-    const categoryNames = device.categories.map(cat => cat.name).join(", ");
+    const categoryLinks = device.categories
+        .map(cat => `<a href="categories.html?id=${cat.id}" class="category-link">${cat.name}</a>`)
+        .join(", ");
 
     // Gerätedetails in die Seite einfügen
     document.getElementById("device_title").textContent = device.name;
@@ -586,7 +593,7 @@ async function loadDeviceDetails() {
     document.getElementById("typ").textContent = device.type;
     document.getElementById("power").textContent = device.power ? `${device.power} Watt` : "Unbekannt";
     document.getElementById("room").textContent = device.room;
-    document.getElementById("category").textContent = categoryNames;
+    document.getElementById("category").textContent = categoryLinks;
 
     // Bearbeiten-Link aktualisieren
     document.getElementById("edit-link").href = `edit.html?id=${device.id}`;
