@@ -835,7 +835,6 @@ async function loadCategoriesOnCategories() {
 }
 
 async function loadDevicesByCategory(categoryId) {
-    mainElement.innerHTML = "";
     const devices = await fetchDevices();
     const mainElement = document.querySelector("main.content");
     const container = document.createElement("div");
@@ -845,6 +844,7 @@ async function loadDevicesByCategory(categoryId) {
         console.warn("Fehler: <main class='content'> nicht gefunden!");
         return;
     }
+    mainElement.innerHTML = "";
 
     // Geräte filtern
     const filteredDevices = categoryId
