@@ -50,7 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const categoryId = urlParams.get("id");
 
     if (path.includes("categories.html")) {
+        const mainElement = document.querySelector("main.content");
         if (categoryId) {
+            mainElement.innerHTML = "";
             loadDevicesByCategory(categoryId);
         } else {
             loadCategoriesOnCategories();
@@ -844,7 +846,7 @@ async function loadDevicesByCategory(categoryId) {
         console.warn("Fehler: <main class='content'> nicht gefunden!");
         return;
     }
-    mainElement.innerHTML = "";
+
 
     // Geräte filtern
     const filteredDevices = categoryId
