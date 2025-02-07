@@ -26,11 +26,12 @@ header {
     height: 70px;
     z-index: 2000;
     position: sticky;
-    justify-content: space-between;
+    justify-content: center;
     top: 0;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
     align-items: center;
+    text-align: center;
     padding: 10px 20px;
     font-size: 20px;
     background-color: #339fff;
@@ -51,6 +52,7 @@ header {
 }
 
 .header-text {
+    text-align: center;
     font-family: "Exo 2";
     font-optical-sizing: auto;
     font-size: 1.5rem;
