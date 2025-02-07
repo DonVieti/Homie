@@ -397,6 +397,7 @@ footer {
     flex-direction: column;
     padding: 2px;
     gap: 5px;
+    max-width:500px;
 }
 
 /* Edit */
