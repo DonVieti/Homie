@@ -110,7 +110,6 @@ main {
     background-color: #f9f9f9;
     border-left: 2px solid #555555;
     border-right: 2px solid #555555;
-
 }
 
 .container-item {
@@ -158,7 +157,7 @@ h3 {
     color: #555;
 }
 
-.btn-details {
+.btn-details,#edit-btn {
     display: inline-block;
     text-decoration: none;
     background: #007BFF;
@@ -168,6 +167,8 @@ h3 {
     border-radius: 5px;
     font-weight: bold;
     transition: background 0.3s ease;
+    max-width: 150px;
+    align-self: center;
 }
 
 .btn-details:hover {
