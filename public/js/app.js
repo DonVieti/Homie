@@ -830,7 +830,7 @@ async function loadCategoriesOnCategories() {
         categories.forEach(category => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${category.name}</td>
+                <td><a href="categories.html?id=${category.id}" class="category-link">${category.name}</a></td>
                 <td>${category.device_count || 0}</td>
                 <td>
                     <button onclick="editCategory(${category.id})" class="btn-edit">Bearbeiten</button>
