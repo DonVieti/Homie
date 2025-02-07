@@ -440,6 +440,7 @@ function setupCRUD() {
         form.reset();
         document.getElementById("device-id").value = "";
         document.getElementById("form-title").textContent = "Gerät hinzufügen";
+        document.getElementById("edit-btn").textContent = "hinzufügen";
 
         loadDevices();
     });
