@@ -118,6 +118,9 @@ main {
     margin-bottom: 15px;
     width: 90vh;
     text-align: center;
+    flex: 1 1 auto;
+    max-width: 100%;
+    box-sizing: border-box;
 
 }
 
