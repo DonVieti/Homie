@@ -343,7 +343,7 @@ async function loadDevices() {
             .join(", ");
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td><img src="${device.image}" alt="${device.name}" width="50"></td>
+            <td><img src="${device.image}" alt="${device.name}" class="device-image"></td>
             <td>${device.name}</td>
             <td>${device.type}</td>
             <td>${device.power} W</td>

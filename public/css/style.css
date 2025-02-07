@@ -483,3 +483,13 @@ h4 {
     cursor: pointer;
     font-size: 16px;
 }
+
+/* Miniatur-Bild */
+.device-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
