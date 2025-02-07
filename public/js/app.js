@@ -545,7 +545,7 @@ async function loadEditForm() {
     document.getElementById("device-type").value = device.type;
     document.getElementById("device-power").value = device.power;
     document.getElementById("device-room").value = device.room;
-    document.getElementById("device-category").value = device.category;
+
     document.getElementById("device-image").value = device.image;
 
     await loadCategories();
@@ -734,7 +734,7 @@ async function deleteCategory(id) {
     }
 }
 
-async function loadCategoryList() {  // <-- Neuer Name, um Verwechslung zu vermeiden
+async function loadCategoryList() {
     const categoryList = document.getElementById("category-list");
     if (!categoryList) return;
 
@@ -765,7 +765,7 @@ async function loadCategoryList() {  // <-- Neuer Name, um Verwechslung zu verme
             categoryList.appendChild(row);
         });
     } catch (error) {
-        console.error("❌ Fehler beim Laden der Kategorien:", error);
+        console.error("Fehler beim Laden der Kategorien:", error);
         alert(`Fehler beim Laden der Kategorien: ${error.message}`);
     }
 }
