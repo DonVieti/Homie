@@ -62,6 +62,8 @@ header {
 }
 
 .nav {
+    align-self: center;
+    height: auto;
     display: flex;
     gap: 15px;
     border: 2px solid #000;
