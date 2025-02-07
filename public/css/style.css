@@ -29,7 +29,7 @@ header {
     justify-content: center;
     top: 0;
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
     text-align: center;
     padding: 10px 20px;
